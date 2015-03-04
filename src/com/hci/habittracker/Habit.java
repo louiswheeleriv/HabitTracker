@@ -6,12 +6,21 @@ import java.util.Date;
 
 public class Habit {
 
-	HabitType habitType;
-	Map<Date, Integer> progress;
+	private int id;
+	private HabitType habitType;
+	private Map<Date, Integer> progress;
 	
 	public Habit(HabitType habitType){
 		this.habitType = habitType;
 		this.progress = new HashMap<Date, Integer>();
+	}
+	
+	public int getId(){
+		return id;
+	}
+	
+	public void setId(int id){
+		this.id = id;
 	}
 	
 	public HabitType getHabitType(){

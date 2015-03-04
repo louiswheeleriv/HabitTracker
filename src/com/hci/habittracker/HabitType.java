@@ -2,12 +2,28 @@ package com.hci.habittracker;
 
 public class HabitType {
 
-	String name;
-	boolean isGoodHabit;
+	private int id;
+	private String name;
 	
-	public HabitType(String name, boolean isGoodHabit){
+	public HabitType(){
+		
+	}
+	
+	public HabitType(int id, String name){
+		this.id = id;
 		this.name = name;
-		this.isGoodHabit = isGoodHabit;
+	}
+	
+	public HabitType(String name){
+		this.name = name;
+	}
+	
+	public int getId(){
+		return id;
+	}
+	
+	public void setId(int id){
+		this.id = id;
 	}
 	
 	public String getName(){
@@ -16,14 +32,6 @@ public class HabitType {
 	
 	public void setName(String name){
 		this.name = name;
-	}
-	
-	public boolean isGoodHabit(){
-		return isGoodHabit;
-	}
-	
-	public void setIsGoodHabit(boolean isGoodHabit){
-		this.isGoodHabit = isGoodHabit;
 	}
 	
 }

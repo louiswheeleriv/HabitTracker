@@ -1,5 +1,8 @@
 package com.hci.habittracker;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -8,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,12 +20,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 
-public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+	static List<HabitType> habitTypes = new ArrayList<HabitType>();
+	
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -45,6 +52,37 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+        
+        // Handle database interactions
+        DatabaseHandler db = new DatabaseHandler(this);
+        
+        // Inserting HabitTypes
+        if(db.getAllHabitTypes().size() == 0){
+        	Log.d("Insert", "Inserting..");
+            db.addHabitType(new HabitType("Exercise"));
+            db.addHabitType(new HabitType("Smoking"));
+            db.addHabitType(new HabitType("Counting Calories"));
+        }
+        
+        // Reading HabitTypes
+        Log.d("Read", "Reading all habit types..");
+        habitTypes = db.getAllHabitTypes();
+        List<String> habitTypeNames = new ArrayList<String>();
+        
+        for(HabitType ht : habitTypes){
+        	String log = "Id: " + ht.getId() + ", Name: " + ht.getName();
+        	habitTypeNames.add(ht.getName());
+        	Log.d("HabitType", log);
+        }
+        
+        /*
+        
+        ListView habitList = (ListView) findViewById(R.id.listView_habits);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, habitTypeNames);
+        habitList.setAdapter(adapter);
+        
+        */
+        
     }
 
     @Override
@@ -129,8 +167,7 @@ public class MainActivity extends ActionBarActivity
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             return rootView;
         }
