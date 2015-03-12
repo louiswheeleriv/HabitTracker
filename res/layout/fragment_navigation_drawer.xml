@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#cccc"
+    android:background="#151515"
     android:choiceMode="singleChoice"
-    android:divider="@android:color/black"
-    android:dividerHeight="2dp"
-    tools:context="com.hci.habittracker.NavigationDrawerFragment" />
+    android:divider="#FFCC00"
+    android:dividerHeight="1dp"
+    tools:context="com.hci.habittracker.NavigationDrawerFragment"/>
