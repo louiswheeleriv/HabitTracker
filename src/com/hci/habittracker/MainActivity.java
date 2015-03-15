@@ -74,7 +74,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         	habitTypeNames.add(ht.getName());
         	Log.d("HabitType", log);
         }
-        
         /*
         ListView habitList = (ListView) findViewById(R.id.listView_habits);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, habitTypeNames);
