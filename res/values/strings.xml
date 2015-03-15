@@ -11,6 +11,13 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     
     <string name="habits_header">Your Habits</string>
+    <string name="button_addHabitType_start">Add Habit Type</string>
+    <string name="text_addHabitType_header">New Habit Type</string>
+    <string name="editText_addHabitType_hint">Name of new habit...</string>
+    <string name="button_addHabitType_submit">Create Habit Type</string>
+    <string name="button_addHabitType_cancel">Cancel</string>
+    
+    <string name="button_deleteHabitType">Delete</string>
     
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>

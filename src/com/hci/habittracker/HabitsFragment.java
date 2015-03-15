@@ -23,13 +23,19 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
 public class HabitsFragment extends ListFragment {
+	
+	DatabaseHandler db;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,7 +43,7 @@ public class HabitsFragment extends ListFragment {
 		View rootview = inflater.inflate(R.layout.fragment_habits, container, false);
 
 		// Get habit types from database and populate list
-		DatabaseHandler db = new DatabaseHandler(getActivity());
+		db = new DatabaseHandler(getActivity());
 		List<HabitType> habitTypes = db.getAllHabitTypes();
 
 		List<String> habitTypeNames = new ArrayList<String>();
@@ -47,6 +53,43 @@ public class HabitsFragment extends ListFragment {
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, habitTypeNames);
 		setListAdapter(adapter);
+		
+		final Button button_addHabitType_start = (Button) rootview.findViewById(R.id.button_addHabitType_start);
+		final EditText editText_addHabitType = (EditText) rootview.findViewById(R.id.editText_addHabitType_name);
+		final Button button_addHabitType_submit = (Button) rootview.findViewById(R.id.button_addHabitType_submit);
+		final Button button_addHabitType_cancel = (Button) rootview.findViewById(R.id.button_addHabitType_cancel);
+		final LinearLayout addHabitTypeSection = (LinearLayout) rootview.findViewById(R.id.linearLayout_addHabitType);
+		
+		// Initial create habit type button clicked
+		button_addHabitType_start.setOnClickListener(new OnClickListener() {
+			public void onClick(View v){	
+				button_addHabitType_start.setVisibility(View.GONE);
+				addHabitTypeSection.setVisibility(View.VISIBLE);
+			}
+		});
+		
+		// Submit button clicked
+		button_addHabitType_submit.setOnClickListener(new OnClickListener() {
+			public void onClick(View v){
+				String habitTypeName = editText_addHabitType.getText().toString();
+				db.addHabitType(new HabitType(habitTypeName));
+
+				button_addHabitType_start.setVisibility(View.VISIBLE);
+				addHabitTypeSection.setVisibility(View.GONE);
+				
+		        getFragmentManager().beginTransaction().replace(R.id.container, new HabitsFragment()).commit();
+			}
+		});
+		
+		// Cancel button clicked
+		button_addHabitType_cancel.setOnClickListener(new OnClickListener() {
+			public void onClick(View v){
+				editText_addHabitType.setText("");
+
+				button_addHabitType_start.setVisibility(View.VISIBLE);
+				addHabitTypeSection.setVisibility(View.GONE);
+			}
+		});
 
 		return rootview;
 	}

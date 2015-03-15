@@ -113,6 +113,12 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		db.close();
 	}
 	
+	public void deleteHabitTypeByName(String name){
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(TABLE_HABITTYPES, KEY_NAME + " = ?", new String[] {name});
+		db.close();
+	}
+	
 	public void deleteAllHabitTypes(){
 		List<HabitType> habitTypeList = getAllHabitTypes();
 		for(HabitType ht : habitTypeList){
