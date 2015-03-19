@@ -28,6 +28,73 @@
         android:layout_height="wrap_content"
         android:text="@string/button_deleteHabitType"
         android:gravity="center"
-        android:layout_margin="10dp"/>
+        android:layout_margin="10dp"
+        android:visibility="gone"/>
+    
+    <Button 
+        android:id="@+id/button_generateData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_generateData"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        android:visibility="gone"/>
+    
+    <DatePicker
+        android:id="@+id/datePicker_habitData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnersShown="false" />
+    
+    <LinearLayout
+        android:id="@+id/linearLayout_habitData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_habitData_dateValueLabel"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:layout_margin="10dp" />
+        
+        <TextView 
+            android:id="@+id/textView_habitData_dateValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+        
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/linearLayout_habitData_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+            
+            <EditText 
+		        android:id="@+id/editText_editHabitData"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:hint="@string/editText_editHabitData_hint"
+		        android:singleLine="true"
+		        android:inputType="number"/>
+            
+            <Button
+                android:id="@+id/button_editHabitData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_editHabitData_label"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:layout_margin="10dp"
+                android:background="#AAAAAA" />
+        
+    </LinearLayout>
 
 </LinearLayout>

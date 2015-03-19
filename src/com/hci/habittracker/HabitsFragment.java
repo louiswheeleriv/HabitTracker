@@ -1,6 +1,7 @@
 package com.hci.habittracker;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import android.support.v7.app.ActionBarActivity;
@@ -25,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -50,6 +52,7 @@ public class HabitsFragment extends ListFragment {
 		for (HabitType ht : habitTypes) {
 			habitTypeNames.add(ht.getName());
 		}
+		Collections.sort(habitTypeNames);
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, habitTypeNames);
 		setListAdapter(adapter);
@@ -58,7 +61,7 @@ public class HabitsFragment extends ListFragment {
 		final EditText editText_addHabitType = (EditText) rootview.findViewById(R.id.editText_addHabitType_name);
 		final Button button_addHabitType_submit = (Button) rootview.findViewById(R.id.button_addHabitType_submit);
 		final Button button_addHabitType_cancel = (Button) rootview.findViewById(R.id.button_addHabitType_cancel);
-		final LinearLayout addHabitTypeSection = (LinearLayout) rootview.findViewById(R.id.linearLayout_addHabitType);
+		final LinearLayout addHabitTypeSection = (LinearLayout) rootview.findViewById(R.id.linearLayout_addHabitType_inner);
 		
 		// Initial create habit type button clicked
 		button_addHabitType_start.setOnClickListener(new OnClickListener() {
@@ -90,6 +93,9 @@ public class HabitsFragment extends ListFragment {
 				addHabitTypeSection.setVisibility(View.GONE);
 			}
 		});
+		
+		// Ensure that the input area remains on screen when the keyboard opens
+		getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
 		return rootview;
 	}
