@@ -24,6 +24,10 @@
     <string name="button_deleteHabitType">Delete</string>
     <string name="button_generateData">Generate Data</string>
     
+    <string name="text_goalLabel">Goal:</string>
+    <string name="editText_editGoal_hint">New goal...</string>
+    <string name="button_editGoal_label">Save</string>
+    
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
 

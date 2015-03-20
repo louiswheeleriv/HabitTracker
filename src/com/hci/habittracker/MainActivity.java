@@ -59,9 +59,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         // Inserting HabitTypes
         if(db.getAllHabitTypes().size() == 0){
         	Log.d("Insert", "Inserting..");
-            db.addHabitType(new HabitType("Exercise"));
+            db.addHabitType(new HabitType("Push-Ups"));
             db.addHabitType(new HabitType("Smoking"));
-            db.addHabitType(new HabitType("Counting Calories"));
+            db.addHabitType(new HabitType("Calorie Intake"));
         }
         
         // Reading HabitTypes
@@ -74,11 +74,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         	habitTypeNames.add(ht.getName());
         	Log.d("HabitType", log);
         }
-        /*
-        ListView habitList = (ListView) findViewById(R.id.listView_habits);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, habitTypeNames);
-        habitList.setAdapter(adapter);
-        */
     }
 
     @Override

@@ -25,6 +25,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	
 	private static final String TABLE_HABITTYPES = "habitTypes";
 	private static final String TABLE_HABITS = "habits";
+	private static final String TABLE_GOALS = "goals";
 	
 	private static final String KEY_ID = "id";
 	private static final String KEY_NAME = "name";
@@ -32,6 +33,8 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	private static final String KEY_HABITTYPE_ID = "habitType_id";
 	private static final String KEY_DATE = "date";
 	private static final String KEY_VALUE = "value";
+
+	private static final String KEY_GOAL = "goal";
 	
 	public DatabaseHandler(Context context){
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -43,14 +46,18 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		Log.d("ALERT", "DatabaseHandler.onCreate()");
 		
 		String CREATE_HABITTYPES_TABLE = "CREATE TABLE " + TABLE_HABITTYPES + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
+				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT, " + KEY_GOAL + " INTEGER" + ")";
 		
 		String CREATE_HABITS_TABLE = "CREATE TABLE " + TABLE_HABITS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_HABITTYPE_ID + " INTEGER NOT NULL,"
 				+ KEY_DATE + " DATE NOT NULL," + KEY_VALUE + " INTEGER NOT NULL" + ")";
 		
+		String CREATE_GOALS_TABLE = "CREATE TABLE " + TABLE_GOALS + "("
+				+ KEY_HABITTYPE_ID + " INTEGER PRIMARY KEY," + KEY_GOAL + " INTEGER" + ")";
+		
 		db.execSQL(CREATE_HABITTYPES_TABLE);
 		db.execSQL(CREATE_HABITS_TABLE);
+		db.execSQL(CREATE_GOALS_TABLE);
 	}
 
 	// Upgrading database
@@ -223,11 +230,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		typeCursor.moveToFirst();
 		int habitTypeId = typeCursor.getInt(0);
 		
-		/*
-		Cursor cursor = db.query(TABLE_HABITS, new String[] {KEY_ID, KEY_HABITTYPE_ID, KEY_DATE, KEY_VALUE}, KEY_HABITTYPE_ID + " = ? AND " + KEY_DATE + " = ?",
-				new String[] {String.valueOf(habitTypeId), date.toString()}, null, null, null, null);
-		*/
-		
 		int year = date.getYear() + 1900;
 		int month = date.getMonth();
 		int day = date.getDate();
@@ -316,18 +318,54 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		}
 	}
 	
+	public void setGoalForHabit(String habitTypeName, int goalValue){
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		Cursor typeCursor = db.query(TABLE_HABITTYPES, new String[] {KEY_ID, KEY_NAME}, KEY_NAME + " = ?",
+				new String[] {habitTypeName}, null, null, null, null);
+		
+		typeCursor.moveToFirst();
+		int habitTypeId = typeCursor.getInt(0);
+		
+		db.delete(TABLE_GOALS, KEY_HABITTYPE_ID + " = ?", new String[] {String.valueOf(habitTypeId)});
+		ContentValues values = new ContentValues();
+		values.put(KEY_HABITTYPE_ID, habitTypeId);
+		values.put(KEY_GOAL, goalValue);
+		db.insert(TABLE_GOALS, null, values);
+		db.close();
+	}
+	
+	public int getGoalForHabit(String habitTypeName){
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		Cursor typeCursor = db.query(TABLE_HABITTYPES, new String[] {KEY_ID, KEY_NAME}, KEY_NAME + " = ?",
+				new String[] {habitTypeName}, null, null, null, null);
+		
+		typeCursor.moveToFirst();
+		int habitTypeId = typeCursor.getInt(0);
+		
+		Cursor cursor = db.query(TABLE_GOALS, new String[] {KEY_HABITTYPE_ID, KEY_GOAL}, KEY_HABITTYPE_ID + " = ?",
+				new String[] {String.valueOf(habitTypeId)}, null, null, null, null);
+		cursor.moveToFirst();
+		try{
+			return cursor.getInt(1);
+		}catch(Exception e){
+			return -1;
+		}
+		
+	}
+	
 	public void deleteAllData(){
 		deleteAllHabitData();
 		deleteAllHabitTypes();
 	}
 	
-	public void createHabitsTable(){
+	public void createGoalsTable(){
 		SQLiteDatabase db = this.getWritableDatabase();
-		String CREATE_HABITS_TABLE = "CREATE TABLE " + TABLE_HABITS + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_HABITTYPE_ID + " INTEGER NOT NULL,"
-				+ KEY_DATE + " DATE NOT NULL," + KEY_VALUE + " INTEGER NOT NULL" + ")";
+		String CREATE_GOALS_TABLE = "CREATE TABLE " + TABLE_GOALS + "("
+				+ KEY_HABITTYPE_ID + " INTEGER PRIMARY KEY," + KEY_GOAL + " INTEGER" + ")";
 		
-		db.execSQL(CREATE_HABITS_TABLE);
+		db.execSQL(CREATE_GOALS_TABLE);
 	}
 	
 }
