@@ -19,6 +19,8 @@
     <string name="button_addHabitType_cancel">Cancel</string>
     
     <string name="text_habitData_dateValueLabel">Value:</string>
+    <string name="text_graphHeader">Progress</string>
+    <string name="text_noProgressData">No recorded data</string>
     <string name="editText_editHabitData_hint">Value for date...</string>
     <string name="button_editHabitData_label">Save</string>
     <string name="button_deleteHabitType">Delete</string>

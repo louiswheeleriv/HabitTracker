@@ -1,10 +1,21 @@
 package com.hci.habittracker;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
+
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -20,6 +31,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class HabitInfoFragment extends Fragment{
@@ -62,7 +74,6 @@ public class HabitInfoFragment extends Fragment{
 		});
 		
 		// Control for DatePicker
-		//final TextView textView_habitData_dateValue = (TextView) rootview.findViewById(R.id.textView_habitData_dateValue);
 		final DatePicker datePicker_habitData = (DatePicker) rootview.findViewById(R.id.datePicker_habitData);
 		Calendar c = Calendar.getInstance();
 		datePicker_habitData.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
@@ -106,6 +117,60 @@ public class HabitInfoFragment extends Fragment{
 			}
 		});
 		
+		Map<Date, Integer> progress = getHabitProgress();
+		
+		if(progress.size() > 0){
+			
+			DataPoint[] dataPoints = new DataPoint[progress.size()];
+			List<Date> dates = new ArrayList<Date>();
+			dates.addAll(progress.keySet());
+			Collections.sort(dates);
+			
+			int count = 0;
+			Date minDate = new Date();
+			
+			for(Date dt : dates){
+				dataPoints[count] = new DataPoint(dt, progress.get(dt));
+				count++;
+				
+				Log.d("ALERT", "Date = [" + dt + "], value = " + progress.get(dt));
+				
+				if(minDate.after(dt)){
+					minDate = dt;
+				}
+			}
+			
+			// Graph
+			GraphView graph = (GraphView) rootview.findViewById(R.id.graph);
+			TextView textView_noProgressData = (TextView) rootview.findViewById(R.id.textView_noProgressData);
+			textView_noProgressData.setVisibility(View.GONE);
+			graph.setVisibility(View.VISIBLE);
+			
+			LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints);
+			graph.addSeries(series);
+			
+			int goal = getGoalForHabit();
+			if(goal >= 0){
+				DataPoint[] goalDataPoints = new DataPoint[2];
+				goalDataPoints[0] = new DataPoint(minDate, goal);
+				goalDataPoints[1] = new DataPoint(new Date(), goal);
+				
+				LineGraphSeries<DataPoint> goalSeries = new LineGraphSeries<DataPoint>(goalDataPoints);
+				goalSeries.setColor(Color.RED);
+				graph.addSeries(goalSeries);
+			}
+			
+			// set date label formatter
+			graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity()));
+			graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
+			
+			// set manual x bounds to have nice steps
+			graph.getViewport().setMinX(minDate.getTime());
+			graph.getViewport().setMaxX(new Date().getTime());
+			graph.getViewport().setXAxisBoundsManual(true);
+			
+		}
+		
 		// Ensure that the input area remains on screen when the keyboard opens
 		getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 		
@@ -129,6 +194,11 @@ public class HabitInfoFragment extends Fragment{
 		}
 	}
 	
+	public Map<Date, Integer> getHabitProgress(){
+		Habit habit = db.getHabit(selectedHabitTypeName);
+		return habit.getProgress();
+	}
+	
 	public void deleteThisHabitType(){
 		db.deleteHabitTypeByName(selectedHabitTypeName);
         getFragmentManager().beginTransaction().replace(R.id.container, new HabitsFragment()).commit();
@@ -150,6 +220,10 @@ public class HabitInfoFragment extends Fragment{
 		db.setGoalForHabit(selectedHabitTypeName, value);
 		TextView textView_goalValue = (TextView) getActivity().findViewById(R.id.textView_goalValue);
 		textView_goalValue.setText(String.valueOf(value));
+	}
+	
+	public int getGoalForHabit(){
+		return db.getGoalForHabit(selectedHabitTypeName);
 	}
 	
 	public void showGoalValue(){

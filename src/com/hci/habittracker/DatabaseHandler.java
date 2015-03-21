@@ -43,8 +43,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	// Creating Tables
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		Log.d("ALERT", "DatabaseHandler.onCreate()");
-		
 		String CREATE_HABITTYPES_TABLE = "CREATE TABLE " + TABLE_HABITTYPES + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT, " + KEY_GOAL + " INTEGER" + ")";
 		
@@ -191,32 +189,38 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		db.close();		
 	}
 	
-	public Habit getHabit(HabitType habitType){
+	public Habit getHabit(String habitTypeName){
 		SQLiteDatabase db = this.getReadableDatabase();
 		
+		Cursor typeCursor = db.query(TABLE_HABITTYPES, new String[] {KEY_ID, KEY_NAME}, KEY_NAME + " = ?",
+				new String[] {habitTypeName}, null, null, null, null);
+		typeCursor.moveToFirst();
+		int habitTypeId = typeCursor.getInt(0);
+		
 		Cursor cursor = db.query(TABLE_HABITS, new String[] {KEY_ID, KEY_HABITTYPE_ID, KEY_DATE, KEY_VALUE}, KEY_HABITTYPE_ID + "=?",
-				new String[] {String.valueOf(habitType.getId())}, null, null, null, null);
+				new String[] {String.valueOf(habitTypeId)}, null, null, null, null);
+		cursor.moveToFirst();
 		
 		Map<Date, Integer> progress = new HashMap<Date, Integer>();
-		DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
+		//DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		
 		do {
-			String dateString = cursor.getString(2);
-		    Date date;
 			try {
+				String dateString = cursor.getString(2);
+			    Date date;
 				date = df.parse(dateString);
+				date.setMonth(date.getMonth() + 1);
+				
 				progress.put(date, cursor.getInt(3));
-			} catch (ParseException e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				Log.d("ERROR", e.getMessage());
 			}
 		} while (cursor.moveToNext());
 		
-		Habit habit = new Habit(habitType, progress);
+		HabitType habitType = getHabitType(habitTypeId);
 		
-		Log.d("HABIT INFO", "HABIT INFO");
-		for(Date dt : progress.keySet()){
-			Log.d(dt.toString(), progress.get(dt).toString());
-		}
+		Habit habit = new Habit(habitType, progress);
 		
 		return habit;
 	}
@@ -238,22 +242,14 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		Cursor cursor = db.query(TABLE_HABITS, new String[] {KEY_ID, KEY_HABITTYPE_ID, KEY_DATE, KEY_VALUE},
 				KEY_HABITTYPE_ID + " = ? " + "AND " + KEY_DATE + " = ?",
 				new String[] {String.valueOf(habitTypeId), dateString}, null, null, null, null);
-		
-		Log.d("ALERT", "Query: WHERE habitTypeId = " + habitTypeId + " AND date = " + dateString);
-		
+				
 		try{
 			cursor.moveToFirst();
 			value = cursor.getInt(3);
 			
-			Log.d("ALERT", "habitTypeId: " + habitTypeId);
-			Log.d("ALERT", "Date: " + date.toString());
-			Log.d("ALERT", "Value: " + value);
-			
 		} catch (Exception e){
 			Log.d("ERROR", e.getMessage());
 		}
-		
-		Log.d("DATE DATA", String.valueOf(value));
 		
 		return value;
 	}
@@ -274,8 +270,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			typeCursor.moveToFirst();
 			int habitTypeId = typeCursor.getInt(0);
 			
-			Log.d("ALERT", "habitTypeId = " + habitTypeId);
-			
 			Map<Date, Integer> progress = new HashMap<Date, Integer>();
 			Calendar cal = Calendar.getInstance();
 			Date today = new Date();
@@ -286,11 +280,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			progress.put(cal.getTime(), 2);
 			cal.add(Calendar.DATE, -1);
 			progress.put(cal.getTime(), 1);
-			
-			for(Date dt : progress.keySet()){
-				Log.d("ALERT", "Date: " + dt.toString());
-				Log.d("ALERT", "Value: " + progress.get(dt));
-			}
 			
 			Habit habit = new Habit(new HabitType(habitTypeId, habitTypeName), progress);
 			addHabitDataForDate(habit.getHabitType().getName(), cal.getTime(), habit.getProgress().get(cal.getTime()));
