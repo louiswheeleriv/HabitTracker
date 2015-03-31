@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -64,6 +65,16 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             db.addHabitType(new HabitType("Calorie Intake"));
         }
         
+        if(savedInstanceState != null){
+        	Log.d("ALERT", "savedInstanceState != null");
+        	if(savedInstanceState.containsKey("Fragment Name")){
+        		Log.d("ALERT", "savedInstanceState has key Fragment Name");
+        		if(savedInstanceState.getString("Fragment Name") == String.valueOf(R.string.habitsInfoFragmentName)){
+        			Log.d("ALERT", "Orientation changed!");
+        		}
+        	}
+        }
+        
         // Reading HabitTypes
         Log.d("Read", "Reading all habit types..");
         habitTypes = db.getAllHabitTypes();
@@ -75,6 +86,20 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         	Log.d("HabitType", log);
         }
     }
+    
+    /*
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
+            Log.e("On Config Change","LANDSCAPE");
+        }else{
+            Log.e("On Config Change","PORTRAIT");
+        }
+
+    }
+    */
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {

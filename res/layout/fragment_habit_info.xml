@@ -89,7 +89,7 @@
 	        android:id="@+id/datePicker_habitData"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:spinnersShown="false" />
+	        android:spinnersShown="true" />
 	    
 	    <LinearLayout
 	        android:id="@+id/linearLayout_habitData"
@@ -128,7 +128,8 @@
 			        android:layout_height="wrap_content"
 			        android:hint="@string/editText_editHabitData_hint"
 			        android:singleLine="true"
-			        android:inputType="number"/>
+			        android:inputType="number"
+			        android:imeOptions="actionDone"/>
 	            
 	            <Button
 	                android:id="@+id/button_editHabitData"
@@ -187,7 +188,8 @@
 			        android:layout_height="wrap_content"
 			        android:hint="@string/editText_editGoal_hint"
 			        android:singleLine="true"
-			        android:inputType="number"/>
+			        android:inputType="number"
+			        android:imeOptions="actionDone"/>
 	            
 	            <Button
 	                android:id="@+id/button_editGoal"

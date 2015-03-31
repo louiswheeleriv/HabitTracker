@@ -3,6 +3,9 @@
 
     <string name="app_name">Habit Tracker</string>
     
+    <string name="habitsFragmentName">HabitsFragment</string>
+    <string name="habitsInfoFragmentName">HabitInfoFragment</string>
+    
     <string name="title_section_home">Home</string>
     <string name="title_section_habits">Habits</string>
     <string name="title_section_progress">Progress</string>

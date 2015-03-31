@@ -107,6 +107,7 @@ public class HabitsFragment extends ListFragment {
 		final Bundle bundle = new Bundle();
 		String selectedHabitType = l.getItemAtPosition(position).toString();
 		bundle.putString("HabitType", selectedHabitType);
+		bundle.putString("Fragment Name", String.valueOf(R.string.habitsInfoFragmentName));
 		infoFragment.setArguments(bundle);
 
 		final FragmentTransaction ft = getFragmentManager().beginTransaction();

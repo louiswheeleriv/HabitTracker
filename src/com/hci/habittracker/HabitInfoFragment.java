@@ -15,18 +15,23 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 
+import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -39,17 +44,38 @@ public class HabitInfoFragment extends Fragment{
 	DatabaseHandler db;
 	String selectedHabitTypeName = "";
 	Date dateSelected = new Date();
+	
+	@Override
+	public void onCreate(Bundle save){
+		super.onCreate(save);
+		setRetainInstance(true);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		View rootview = inflater.inflate(R.layout.fragment_habit_info, container, false);
 		
+		this.setRetainInstance(true);
+		
 		db = new DatabaseHandler(getActivity());
 		
 		Bundle args = getArguments();
 		if (args != null && args.containsKey("HabitType")){
 			selectedHabitTypeName = args.getString("HabitType");
+			if(args.containsKey("Selected Date")){
+				int[] dateArray = args.getIntArray("Selected Date");
+				int year = dateArray[0];
+				int month = dateArray[1];
+				int day = dateArray[2];
+								
+				Date chosenDate = new Date();
+				chosenDate.setDate(day);
+				chosenDate.setMonth(month);
+				chosenDate.setYear(year-1900);
+				
+				dateSelected = chosenDate;
+			}
 		}
 		
 		// Habit name at top
@@ -91,6 +117,28 @@ public class HabitInfoFragment extends Fragment{
 			}
 		});
 		
+		datePicker_habitData.setOnTouchListener(new OnTouchListener(){
+			@Override
+	        public boolean onTouch(View v, MotionEvent event) {
+	            int action = event.getAction();
+	            switch (action) {
+	            case MotionEvent.ACTION_DOWN:
+	                // Disallow ScrollView to intercept touch events.
+	                v.getParent().requestDisallowInterceptTouchEvent(true);
+	                break;
+
+	            case MotionEvent.ACTION_UP:
+	                // Allow ScrollView to intercept touch events.
+	                v.getParent().requestDisallowInterceptTouchEvent(false);
+	                break;
+	            }
+
+	            // Handle DatePicker touch events.
+	            v.onTouchEvent(event);
+	            return true;
+	        }
+		});
+		
 		// Edit value for date
 		final EditText editText_editHabitData = (EditText) rootview.findViewById(R.id.editText_editHabitData);
 		Button button_editHabitData = (Button) rootview.findViewById(R.id.button_editHabitData);
@@ -101,7 +149,9 @@ public class HabitInfoFragment extends Fragment{
 				setHabitDataForDate(valueEntered);
 				editText_editHabitData.setText("");
 				
+				hideKeyboard();
 				showSelectedDateData();
+				reloadFragment();
 			}
 		});
 		
@@ -114,62 +164,12 @@ public class HabitInfoFragment extends Fragment{
 				int valueEntered = Integer.valueOf(valueEnteredString);
 				setGoalForHabit(valueEntered);
 				editText_editGoal.setText("");
+				hideKeyboard();
+				reloadFragment();
 			}
 		});
 		
-		Map<Date, Integer> progress = getHabitProgress();
-		
-		if(progress.size() > 0){
-			
-			DataPoint[] dataPoints = new DataPoint[progress.size()];
-			List<Date> dates = new ArrayList<Date>();
-			dates.addAll(progress.keySet());
-			Collections.sort(dates);
-			
-			int count = 0;
-			Date minDate = new Date();
-			
-			for(Date dt : dates){
-				dataPoints[count] = new DataPoint(dt, progress.get(dt));
-				count++;
-				
-				Log.d("ALERT", "Date = [" + dt + "], value = " + progress.get(dt));
-				
-				if(minDate.after(dt)){
-					minDate = dt;
-				}
-			}
-			
-			// Graph
-			GraphView graph = (GraphView) rootview.findViewById(R.id.graph);
-			TextView textView_noProgressData = (TextView) rootview.findViewById(R.id.textView_noProgressData);
-			textView_noProgressData.setVisibility(View.GONE);
-			graph.setVisibility(View.VISIBLE);
-			
-			LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints);
-			graph.addSeries(series);
-			
-			int goal = getGoalForHabit();
-			if(goal >= 0){
-				DataPoint[] goalDataPoints = new DataPoint[2];
-				goalDataPoints[0] = new DataPoint(minDate, goal);
-				goalDataPoints[1] = new DataPoint(new Date(), goal);
-				
-				LineGraphSeries<DataPoint> goalSeries = new LineGraphSeries<DataPoint>(goalDataPoints);
-				goalSeries.setColor(Color.RED);
-				graph.addSeries(goalSeries);
-			}
-			
-			// set date label formatter
-			graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity()));
-			graph.getGridLabelRenderer().setNumHorizontalLabels(3); // only 4 because of the space
-			
-			// set manual x bounds to have nice steps
-			graph.getViewport().setMinX(minDate.getTime());
-			graph.getViewport().setMaxX(new Date().getTime());
-			graph.getViewport().setXAxisBoundsManual(true);
-			
-		}
+		drawGraph(rootview);
 		
 		// Ensure that the input area remains on screen when the keyboard opens
 		getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
@@ -179,8 +179,14 @@ public class HabitInfoFragment extends Fragment{
 	
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState){
+		determineDate();
 		showSelectedDateData();
 		showGoalValue();
+	}
+	
+	public void determineDate(){
+		DatePicker datePicker_habitData = (DatePicker) getActivity().findViewById(R.id.datePicker_habitData);
+		datePicker_habitData.updateDate(dateSelected.getYear() + 1900, dateSelected.getMonth(), dateSelected.getDate());
 	}
 	
 	public void showSelectedDateData(){
@@ -235,6 +241,98 @@ public class HabitInfoFragment extends Fragment{
 		}else{
 			textView_goalValue.setText("None");
 		}
+	}
+	
+	public void drawGraph(View rootview){
+		Map<Date, Integer> progress = getHabitProgress();
+		
+		if(progress.size() > 0){
+			
+			DataPoint[] dataPoints = new DataPoint[progress.size()];
+			List<Date> dates = new ArrayList<Date>();
+			dates.addAll(progress.keySet());
+			Collections.sort(dates);
+			
+			int count = 0;
+			Date minDate = new Date();
+			
+			for(Date dt : dates){
+				dataPoints[count] = new DataPoint(dt, progress.get(dt));
+				count++;
+								
+				if(minDate.after(dt)){
+					minDate = dt;
+				}
+			}
+			
+			// Graph
+			GraphView graph = (GraphView) rootview.findViewById(R.id.graph);
+			TextView textView_noProgressData = (TextView) rootview.findViewById(R.id.textView_noProgressData);
+			textView_noProgressData.setVisibility(View.GONE);
+			graph.setVisibility(View.VISIBLE);
+			
+			LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints);
+			graph.addSeries(series);
+			
+			int goal = getGoalForHabit();
+			if(goal >= 0){
+				DataPoint[] goalDataPoints = new DataPoint[2];
+				goalDataPoints[0] = new DataPoint(minDate, goal);
+				goalDataPoints[1] = new DataPoint(new Date(), goal);
+				
+				LineGraphSeries<DataPoint> goalSeries = new LineGraphSeries<DataPoint>(goalDataPoints);
+				goalSeries.setColor(Color.RED);
+				graph.addSeries(goalSeries);
+			}
+			
+			// set date label formatter
+			graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity()));
+			
+			int numLabels = 3;
+			Configuration config = getResources().getConfiguration();
+			if(config.orientation == config.ORIENTATION_LANDSCAPE){
+				numLabels = 5;
+			}
+			graph.getGridLabelRenderer().setNumHorizontalLabels(numLabels); // only 4 because of the space
+			
+			// set manual x bounds to have nice steps
+			graph.getViewport().setMinX(minDate.getTime());
+			graph.getViewport().setMaxX(new Date().getTime());
+			graph.getViewport().setXAxisBoundsManual(true);
+			
+		}
+	}
+	
+	public void hideKeyboard() {
+		InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+		inputManager.hideSoftInputFromWindow(
+				getActivity().getCurrentFocus().getWindowToken(),
+				InputMethodManager.HIDE_NOT_ALWAYS);
+	}
+	
+	public void reloadFragment(){
+		HabitInfoFragment infoFragment = new HabitInfoFragment();
+		final Bundle bundle = new Bundle();
+		bundle.putString("HabitType", selectedHabitTypeName);
+		
+		DatePicker datePicker_habitData = (DatePicker) getActivity().findViewById(R.id.datePicker_habitData);
+		int year = datePicker_habitData.getYear();
+		int month = datePicker_habitData.getMonth();
+		int day = datePicker_habitData.getDayOfMonth();
+		bundle.putIntArray("Selected Date", new int[] {year, month, day});
+		infoFragment.setArguments(bundle);
+
+		final FragmentTransaction ft = getFragmentManager().beginTransaction();
+		ft.replace(R.id.container, infoFragment);
+		//ft.addToBackStack(null);
+		ft.commit();
+	}
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+	    super.onConfigurationChanged(newConfig);	    
+	    reloadFragment();
 	}
 	
 }
