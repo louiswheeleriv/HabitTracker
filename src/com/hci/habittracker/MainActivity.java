@@ -58,12 +58,14 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         DatabaseHandler db = new DatabaseHandler(this);
         
         // Inserting HabitTypes
+        /*
         if(db.getAllHabitTypes().size() == 0){
         	Log.d("Insert", "Inserting..");
             db.addHabitType(new HabitType("Push-Ups"));
             db.addHabitType(new HabitType("Smoking"));
             db.addHabitType(new HabitType("Calorie Intake"));
         }
+        */
         
         if(savedInstanceState != null){
         	Log.d("ALERT", "savedInstanceState != null");

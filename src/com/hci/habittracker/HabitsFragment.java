@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -80,6 +82,8 @@ public class HabitsFragment extends ListFragment {
 				button_addHabitType_start.setVisibility(View.VISIBLE);
 				addHabitTypeSection.setVisibility(View.GONE);
 				
+				hideKeyboard();
+				
 		        getFragmentManager().beginTransaction().replace(R.id.container, new HabitsFragment()).commit();
 			}
 		});
@@ -111,10 +115,19 @@ public class HabitsFragment extends ListFragment {
 		infoFragment.setArguments(bundle);
 
 		final FragmentTransaction ft = getFragmentManager().beginTransaction();
-		ft.replace(R.id.container, infoFragment);
+		//ft.replace(R.id.container, infoFragment);
+		ft.replace(((ViewGroup)(getView().getParent())).getId(), infoFragment);
 		ft.addToBackStack(null);
 		ft.commit();
 
+	}
+	
+	public void hideKeyboard() {
+		InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+		inputManager.hideSoftInputFromWindow(
+				getActivity().getCurrentFocus().getWindowToken(),
+				InputMethodManager.HIDE_NOT_ALWAYS);
 	}
 
 }

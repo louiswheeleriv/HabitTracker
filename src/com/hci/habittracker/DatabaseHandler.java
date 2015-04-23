@@ -96,6 +96,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		String name = cursor.getString(1);
 		
 		HabitType habitType = new HabitType(Integer.parseInt(cursor.getString(0)), name);
+		db.close();
 		return habitType;
 	}
 	
@@ -116,6 +117,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			}while(cursor.moveToNext());
 		}
 		
+		db.close();
 		return habitTypeList;
 	}
 	
@@ -147,7 +149,20 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	
 	public int deleteHabitTypeByName(String name){
 		SQLiteDatabase db = this.getWritableDatabase();
+		
+		Cursor typeCursor = db.query(TABLE_HABITTYPES, new String[] {KEY_ID, KEY_NAME}, KEY_NAME + " = ?",
+				new String[] {name}, null, null, null, null);
+		typeCursor.moveToFirst();
+		int habitTypeId = -1;
+		try {
+			habitTypeId = typeCursor.getInt(0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		int numAffected = db.delete(TABLE_HABITTYPES, KEY_NAME + " = ?", new String[] {name});
+		db.delete(TABLE_HABITS, KEY_HABITTYPE_ID + " = ?", new String[] {String.valueOf(habitTypeId)});
+		db.delete(TABLE_GOALS, KEY_HABITTYPE_ID + " = ?", new String[] {String.valueOf(habitTypeId)});
 		db.close();
 		return numAffected;
 	}
@@ -189,6 +204,17 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		db.close();		
 	}
 	
+	public void removeHabitDataForDate(Date date){
+		SQLiteDatabase db = this.getWritableDatabase();
+		
+		int year = date.getYear() + 1900;
+		int month = date.getMonth();
+		int day = date.getDate();
+		String dateString = year + "-" + month + "-" + day;
+		
+		db.delete(TABLE_HABITS, KEY_DATE + " = ?", new String[] {dateString});
+	}
+	
 	public Habit getHabit(String habitTypeName){
 		SQLiteDatabase db = this.getReadableDatabase();
 		
@@ -197,20 +223,31 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		typeCursor.moveToFirst();
 		int habitTypeId = typeCursor.getInt(0);
 		
-		Cursor cursor = db.query(TABLE_HABITS, new String[] {KEY_ID, KEY_HABITTYPE_ID, KEY_DATE, KEY_VALUE}, KEY_HABITTYPE_ID + "=?",
+		Cursor cursor = db.query(TABLE_HABITS, new String[] {KEY_ID, KEY_HABITTYPE_ID, KEY_DATE, KEY_VALUE}, KEY_HABITTYPE_ID + " = ?",
 				new String[] {String.valueOf(habitTypeId)}, null, null, null, null);
 		cursor.moveToFirst();
 		
 		Map<Date, Integer> progress = new HashMap<Date, Integer>();
-		//DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		
 		do {
 			try {
 				String dateString = cursor.getString(2);
+				
+				int firstDash = dateString.indexOf('-', 0);
+				int secondDash = dateString.indexOf('-', firstDash + 1);
+				
+				String yearString = dateString.substring(0, firstDash);
+				String monthString = dateString.substring(firstDash + 1, secondDash);
+				String dayString = dateString.substring(secondDash + 1);
+				
+				int month = Integer.valueOf(monthString);
+				month++;
+				
+				String adjustedDateString = (yearString + "-" + month + "-" + dayString);
+				
 			    Date date;
-				date = df.parse(dateString);
-				date.setMonth(date.getMonth() + 1);
+				date = df.parse(adjustedDateString);
 				
 				progress.put(date, cursor.getInt(3));
 			} catch (Exception e) {
@@ -221,6 +258,12 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		HabitType habitType = getHabitType(habitTypeId);
 		
 		Habit habit = new Habit(habitType, progress);
+		
+		for(Date dt : progress.keySet()){
+			Log.d("ALERT", "progress.get(" + dt.toString() + ") = " + progress.get(dt));
+		}
+		
+		db.close();
 		
 		return habit;
 	}
@@ -251,6 +294,8 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 			Log.d("ERROR", e.getMessage());
 		}
 		
+		db.close();
+		
 		return value;
 	}
 	
@@ -259,38 +304,6 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		int numAffected = db.delete(TABLE_HABITS, KEY_HABITTYPE_ID + " = ?", new String[] {String.valueOf(habitType.getId())});
 		db.close();
 		return numAffected;
-	}
-	
-	public void generateHabitData(String habitTypeName){
-		SQLiteDatabase db = this.getWritableDatabase();
-		Cursor typeCursor = db.query(TABLE_HABITTYPES, new String[] {KEY_ID, KEY_NAME}, KEY_NAME + "=?", 
-				new String[] {habitTypeName}, null, null, null, null);
-		
-		if(typeCursor != null){
-			typeCursor.moveToFirst();
-			int habitTypeId = typeCursor.getInt(0);
-			
-			Map<Date, Integer> progress = new HashMap<Date, Integer>();
-			Calendar cal = Calendar.getInstance();
-			Date today = new Date();
-			cal.setTime(today);
-
-			progress.put(cal.getTime(), 3);
-			cal.add(Calendar.DATE, -1);
-			progress.put(cal.getTime(), 2);
-			cal.add(Calendar.DATE, -1);
-			progress.put(cal.getTime(), 1);
-			
-			Habit habit = new Habit(new HabitType(habitTypeId, habitTypeName), progress);
-			addHabitDataForDate(habit.getHabitType().getName(), cal.getTime(), habit.getProgress().get(cal.getTime()));
-			cal.add(Calendar.DATE, 1);
-			addHabitDataForDate(habit.getHabitType().getName(), cal.getTime(), habit.getProgress().get(cal.getTime()));
-			cal.add(Calendar.DATE, 1);
-			addHabitDataForDate(habit.getHabitType().getName(), cal.getTime(), habit.getProgress().get(cal.getTime()));
-			
-		}else{
-			return;
-		}
 	}
 	
 	public int deleteHabitDataByType(HabitType habitType){
@@ -336,6 +349,8 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		Cursor cursor = db.query(TABLE_GOALS, new String[] {KEY_HABITTYPE_ID, KEY_GOAL}, KEY_HABITTYPE_ID + " = ?",
 				new String[] {String.valueOf(habitTypeId)}, null, null, null, null);
 		cursor.moveToFirst();
+		
+		db.close();
 		try{
 			return cursor.getInt(1);
 		}catch(Exception e){
@@ -345,8 +360,14 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	}
 	
 	public void deleteAllData(){
-		deleteAllHabitData();
-		deleteAllHabitTypes();
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.query(TABLE_HABITTYPES, new String[] {KEY_ID, KEY_NAME}, KEY_ID + " <> ?",
+				new String[] {String.valueOf(-1)}, null, null, null, null);
+		cursor.moveToFirst();
+		
+		do {
+			deleteHabitTypeByName(cursor.getString(1));
+		} while (cursor.moveToNext());
 	}
 	
 	public void createGoalsTable(){

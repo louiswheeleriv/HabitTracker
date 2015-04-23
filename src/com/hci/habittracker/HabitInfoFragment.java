@@ -90,15 +90,6 @@ public class HabitInfoFragment extends Fragment{
 			}
 		});
 		
-		// Control for generate data button
-		Button button_generateData = (Button) rootview.findViewById(R.id.button_generateData);
-		button_generateData.setOnClickListener(new OnClickListener() {
-			public void onClick(View v){
-				generateData();
-				showSelectedDateData();
-			}
-		});
-		
 		// Control for DatePicker
 		final DatePicker datePicker_habitData = (DatePicker) rootview.findViewById(R.id.datePicker_habitData);
 		Calendar c = Calendar.getInstance();
@@ -139,10 +130,27 @@ public class HabitInfoFragment extends Fragment{
 	        }
 		});
 		
+		// Control for data editing
+		final Button button_editHabitData_edit = (Button) rootview.findViewById(R.id.button_editHabitData_edit);
+		button_editHabitData_edit.setOnClickListener(new OnClickListener() {
+			public void onClick(View v){
+				String label = (String) button_editHabitData_edit.getText();
+				if(label.equals("Set Value")){
+					LinearLayout linearLayout_habitData_edit = (LinearLayout) getActivity().findViewById(R.id.linearLayout_habitData_edit);
+					linearLayout_habitData_edit.setVisibility(View.VISIBLE);
+					button_editHabitData_edit.setText(R.string.button_editHabitData_cancel);
+				}else if(label.equals("Cancel")){
+					LinearLayout linearLayout_habitData_edit = (LinearLayout) getActivity().findViewById(R.id.linearLayout_habitData_edit);
+					linearLayout_habitData_edit.setVisibility(View.GONE);
+					button_editHabitData_edit.setText(R.string.button_editHabitData_edit);
+				}
+			}
+		});
+		
 		// Edit value for date
 		final EditText editText_editHabitData = (EditText) rootview.findViewById(R.id.editText_editHabitData);
-		Button button_editHabitData = (Button) rootview.findViewById(R.id.button_editHabitData);
-		button_editHabitData.setOnClickListener(new OnClickListener() {
+		Button button_editHabitData_save = (Button) rootview.findViewById(R.id.button_editHabitData_save);
+		button_editHabitData_save.setOnClickListener(new OnClickListener() {
 			public void onClick(View v){
 				String valueEnteredString = editText_editHabitData.getText().toString();
 				int valueEntered = Integer.valueOf(valueEnteredString);
@@ -155,14 +163,53 @@ public class HabitInfoFragment extends Fragment{
 			}
 		});
 		
+		// Erase value for date
+		Button button_editHabitData_erase = (Button) rootview.findViewById(R.id.button_editHabitData_erase);
+		button_editHabitData_erase.setOnClickListener(new OnClickListener() {
+			public void onClick(View v){
+				removeHabitDataForDate();
+				editText_editHabitData.setText("");
+				hideKeyboard();
+				showSelectedDateData();
+				reloadFragment();
+			}
+		});
+		
+		// Control for goal editing
+		final Button button_editGoal_edit = (Button) rootview.findViewById(R.id.button_editGoal_edit);
+		button_editGoal_edit.setOnClickListener(new OnClickListener() {
+			public void onClick(View v){
+				String label = (String) button_editGoal_edit.getText();
+				if(label.equals("Set Value")){
+					LinearLayout linearLayout_goal_edit = (LinearLayout) getActivity().findViewById(R.id.linearLayout_goal_edit);
+					linearLayout_goal_edit.setVisibility(View.VISIBLE);
+					button_editGoal_edit.setText(R.string.button_editGoal_label_cancel);
+				}else if(label.equals("Cancel")){
+					LinearLayout linearLayout_goal_edit = (LinearLayout) getActivity().findViewById(R.id.linearLayout_goal_edit);
+					linearLayout_goal_edit.setVisibility(View.GONE);
+					button_editGoal_edit.setText(R.string.button_editGoal_label_edit);
+				}
+			}
+		});
+		
 		// Edit goal
 		final EditText editText_editGoal = (EditText) rootview.findViewById(R.id.editText_editGoal);
-		Button button_editGoal = (Button) rootview.findViewById(R.id.button_editGoal);
-		button_editGoal.setOnClickListener(new OnClickListener() {
+		Button button_editGoal_save = (Button) rootview.findViewById(R.id.button_editGoal_save);
+		button_editGoal_save.setOnClickListener(new OnClickListener() {
 			public void onClick(View v){
 				String valueEnteredString = editText_editGoal.getText().toString();
 				int valueEntered = Integer.valueOf(valueEnteredString);
 				setGoalForHabit(valueEntered);
+				editText_editGoal.setText("");
+				hideKeyboard();
+				reloadFragment();
+			}
+		});
+		
+		Button button_editGoal_erase = (Button) rootview.findViewById(R.id.button_editGoal_erase);
+		button_editGoal_erase.setOnClickListener(new OnClickListener() {
+			public void onClick(View v){
+				setGoalForHabit(-1);
 				editText_editGoal.setText("");
 				hideKeyboard();
 				reloadFragment();
@@ -210,12 +257,12 @@ public class HabitInfoFragment extends Fragment{
         getFragmentManager().beginTransaction().replace(R.id.container, new HabitsFragment()).commit();
 	}
 	
-	public void generateData(){
-		db.generateHabitData(selectedHabitTypeName);
-	}
-	
 	public void setHabitDataForDate(int value){
 		db.addHabitDataForDate(selectedHabitTypeName, dateSelected, value);
+	}
+	
+	public void removeHabitDataForDate(){
+		db.removeHabitDataForDate(dateSelected);
 	}
 	
 	public int getHabitDataForDate(Date date){
@@ -246,34 +293,74 @@ public class HabitInfoFragment extends Fragment{
 	public void drawGraph(View rootview){
 		Map<Date, Integer> progress = getHabitProgress();
 		
-		if(progress.size() > 0){
+		// Remove empty dates
+		List<Date> datesToRemove = new ArrayList<Date>();
+		for(Date dt : progress.keySet()){
+			if(progress.get(dt) < 0){
+				datesToRemove.add(dt);
+			}
+		}
+		
+		for(Date dt : datesToRemove){
+			progress.remove(dt);
+		}
+		
+		if(progress.size() > 1){
 			
 			DataPoint[] dataPoints = new DataPoint[progress.size()];
 			List<Date> dates = new ArrayList<Date>();
 			dates.addAll(progress.keySet());
 			Collections.sort(dates);
 			
+			// Generate datapoint array and determine min and max X values
 			int count = 0;
 			Date minDate = new Date();
+			Date maxDate = dates.get(0);
 			
 			for(Date dt : dates){
-				dataPoints[count] = new DataPoint(dt, progress.get(dt));
-				count++;
-								
-				if(minDate.after(dt)){
-					minDate = dt;
+				int value = progress.get(dt);
+				if(value >= 0){
+					Log.d("ALERT", "Creating datapoint with date " + dt.toString());
+					
+					dataPoints[count] = new DataPoint(dt, value);
+					count++;
+						
+					if(minDate.after(dt)){
+						minDate = dt;
+					}
+					
+					if(maxDate.before(dt)){
+						maxDate = dt;
+					}
 				}
 			}
 			
-			// Graph
+			// Create graph
 			GraphView graph = (GraphView) rootview.findViewById(R.id.graph);
 			TextView textView_noProgressData = (TextView) rootview.findViewById(R.id.textView_noProgressData);
 			textView_noProgressData.setVisibility(View.GONE);
 			graph.setVisibility(View.VISIBLE);
 			
+			// Determine min and max Y values
+			int lowestValue = (int) dataPoints[0].getY();
+			int highestValue = (int) dataPoints[0].getY();
+			
+			for(int i = 0; i < dataPoints.length; i++){
+				Date dt = new Date();
+				dt.setTime((long) dataPoints[i].getX());
+				if(dataPoints[i].getY() < lowestValue){
+					lowestValue = (int) dataPoints[i].getY();
+				}
+				if(dataPoints[i].getY() > highestValue){
+					highestValue = (int) dataPoints[i].getY();
+				}
+			}
+			
+			// Add series to graph
 			LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints);
 			graph.addSeries(series);
 			
+			// Add goal line
 			int goal = getGoalForHabit();
 			if(goal >= 0){
 				DataPoint[] goalDataPoints = new DataPoint[2];
@@ -285,20 +372,28 @@ public class HabitInfoFragment extends Fragment{
 				graph.addSeries(goalSeries);
 			}
 			
-			// set date label formatter
+			// Set date label formatter
 			graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity()));
 			
+			// Determine orientation and number of labels
 			int numLabels = 3;
 			Configuration config = getResources().getConfiguration();
 			if(config.orientation == config.ORIENTATION_LANDSCAPE){
 				numLabels = 5;
 			}
-			graph.getGridLabelRenderer().setNumHorizontalLabels(numLabels); // only 4 because of the space
+			graph.getGridLabelRenderer().setNumHorizontalLabels(numLabels);
 			
-			// set manual x bounds to have nice steps
+			// Set X and Y bounds
 			graph.getViewport().setMinX(minDate.getTime());
-			graph.getViewport().setMaxX(new Date().getTime());
+			graph.getViewport().setMaxX(maxDate.getTime());
 			graph.getViewport().setXAxisBoundsManual(true);
+
+			Log.d("ALERT", "Setting graph min date to " + minDate.toString());
+			Log.d("ALERT", "Setting graph max date to " + maxDate.toString());
+			
+			graph.getViewport().setMinY(lowestValue);
+			graph.getViewport().setMaxY(highestValue);
+			graph.getViewport().setYAxisBoundsManual(true);
 			
 		}
 	}

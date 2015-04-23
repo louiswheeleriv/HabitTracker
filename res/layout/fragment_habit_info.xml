@@ -16,21 +16,14 @@
 	        android:textStyle="bold"
 	        android:paddingTop="20dp" />
 	    
-	    <View
-	        android:layout_width="match_parent"
-	        android:layout_height="2dp"
-	        android:background="#000000"
-	        android:layout_marginLeft="20dp"
-	        android:layout_marginRight="20dp"
-	        android:layout_marginTop="10dp"
-	        android:layout_marginBottom="10dp" />
-	    
 	    <LinearLayout
 	        android:id="@+id/linearLayout_progress"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
+	        android:layout_margin="10dp"
 	        android:orientation="vertical"
-	        android:gravity="center" >
+	        android:gravity="center"
+	        android:background="@drawable/customborder" >
 	        
 	        <TextView
 		        android:layout_width="wrap_content"
@@ -55,17 +48,195 @@
 		        android:textStyle="bold"
 		        android:layout_marginBottom="10dp"
 		        android:visibility="visible" />
-		    
-		    <View
-		        android:layout_width="match_parent"
-		        android:layout_height="2dp"
-		        android:background="#000000"
-		        android:layout_marginLeft="20dp"
-		        android:layout_marginRight="20dp"
-		        android:layout_marginTop="10dp"
-		        android:layout_marginBottom="10dp" />
 	        
 	    </LinearLayout>
+	    
+	    <LinearLayout
+	        android:id="@+id/linearLayout_habitData"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_margin="10dp"
+	        android:orientation="vertical"
+	        android:gravity="center"
+	        android:background="@drawable/customborder">
+	        
+	        <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/text_habitData"
+		        android:textSize="20sp"
+		        android:textStyle="bold"
+		        android:layout_marginBottom="10dp" />
+	        
+	        <DatePicker
+		        android:id="@+id/datePicker_habitData"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:spinnersShown="true" />
+	        
+	        <LinearLayout
+		        android:id="@+id/linearLayout_habitData_info"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal"
+		        android:gravity="center">
+			    
+		        
+		        <TextView
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="@string/text_habitData_dateValueLabel"
+		            android:textSize="30sp"
+		            android:textStyle="bold"
+		            android:layout_margin="10dp" />
+		        
+		        <TextView 
+		            android:id="@+id/textView_habitData_dateValue"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:textSize="30sp"
+		            android:textStyle="bold" />
+		        
+		        <Button 
+		            android:id="@+id/button_editHabitData_edit"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="@string/button_editHabitData_edit"
+		            android:layout_marginLeft="30dp"
+		            android:paddingLeft="15dp"
+		            android:paddingRight="15dp"
+		            android:paddingTop="10dp"
+		            android:paddingBottom="10dp"/>
+		        
+		    </LinearLayout>
+		    
+	        <LinearLayout
+		        android:id="@+id/linearLayout_habitData_edit"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal"
+		        android:gravity="center"
+		        android:visibility="gone">
+		            
+		            <EditText 
+				        android:id="@+id/editText_editHabitData"
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:hint="@string/editText_editHabitData_hint"
+				        android:singleLine="true"
+				        android:inputType="number"
+				        android:imeOptions="actionDone"/>
+		            
+		            <Button
+		                android:id="@+id/button_editHabitData_save"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:text="@string/button_editHabitData_save"
+		                android:paddingLeft="10dp"
+		                android:paddingRight="10dp"
+		                android:layout_margin="10dp"
+		                android:background="#AAAAAA" />
+		            
+		            <Button
+		                android:id="@+id/button_editHabitData_erase"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:text="@string/button_editHabitData_erase"
+		                android:paddingLeft="10dp"
+		                android:paddingRight="10dp"
+		                android:layout_margin="10dp"
+		                android:background="#AAAAAA" />
+		        
+		    </LinearLayout>
+        
+	    </LinearLayout>
+	    
+	    <LinearLayout
+	        android:id="@+id/linearLayout_goal"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_margin="10dp"
+	        android:orientation="vertical"
+	        android:gravity="center"
+	        android:background="@drawable/customborder"
+	        android:layout_marginBottom="100dp">
+	            
+	        <LinearLayout
+	            android:id="@+id/linearLayout_goal_controls"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal"
+		        android:gravity="center">
+		        
+		        <TextView 
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="@string/text_goalLabel"
+		            android:textSize="30sp"
+		            android:textStyle="bold"
+		            android:layout_margin="10dp" />
+		        
+		        <TextView 
+		            android:id="@+id/textView_goalValue"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:textSize="30sp"
+		            android:textStyle="bold"/>
+		        
+		        <Button
+		            android:id="@+id/button_editGoal_edit"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_marginLeft="30dp"
+		            android:text="@string/button_editGoal_label_edit"
+		            android:paddingLeft="15dp"
+		            android:paddingRight="15dp"
+		            android:paddingTop="10dp"
+		            android:paddingBottom="10dp"/>
+		        
+		    </LinearLayout>
+	        
+	        <LinearLayout
+	            android:id="@+id/linearLayout_goal_edit"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal"
+		        android:gravity="center"
+		        android:visibility="gone">
+		            
+		            <EditText 
+				        android:id="@+id/editText_editGoal"
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:hint="@string/editText_editGoal_hint"
+				        android:singleLine="true"
+				        android:inputType="number"
+				        android:imeOptions="actionDone"/>
+		            
+		            <Button
+		                android:id="@+id/button_editGoal_save"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:text="@string/button_editGoal_label_save"
+		                android:paddingLeft="25dp"
+		                android:paddingRight="25dp"
+		                android:layout_margin="10dp"
+		                android:background="#AAAAAA" />
+		            
+		            <Button
+		                android:id="@+id/button_editGoal_erase"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:text="@string/button_editGoal_label_erase"
+		                android:paddingLeft="10dp"
+		                android:paddingRight="10dp"
+		                android:layout_margin="10dp"
+		                android:background="#AAAAAA" />
+		        
+		    </LinearLayout>
+	        
+	    </LinearLayout>
+	    
 	    
 	    <Button 
 	        android:id="@+id/button_deleteHabitType"
@@ -74,134 +245,8 @@
 	        android:text="@string/button_deleteHabitType"
 	        android:gravity="center"
 	        android:layout_margin="10dp"
-	        android:visibility="gone"/>
+	        android:visibility="visible"/>
 	    
-	    <Button 
-	        android:id="@+id/button_generateData"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:text="@string/button_generateData"
-	        android:gravity="center"
-	        android:layout_margin="10dp"
-	        android:visibility="gone"/>
-	    
-	    <DatePicker
-	        android:id="@+id/datePicker_habitData"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:spinnersShown="true" />
-	    
-	    <LinearLayout
-	        android:id="@+id/linearLayout_habitData"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal"
-	        android:gravity="center">
-	        
-	        <TextView
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:text="@string/text_habitData_dateValueLabel"
-	            android:textSize="30sp"
-	            android:textStyle="bold"
-	            android:layout_margin="10dp" />
-	        
-	        <TextView 
-	            android:id="@+id/textView_habitData_dateValue"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:textSize="30sp"
-	            android:textStyle="bold" />
-	        
-	    </LinearLayout>
-	    
-	    <LinearLayout
-	        android:id="@+id/linearLayout_habitData_edit"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal"
-	        android:gravity="center">
-	            
-	            <EditText 
-			        android:id="@+id/editText_editHabitData"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:hint="@string/editText_editHabitData_hint"
-			        android:singleLine="true"
-			        android:inputType="number"
-			        android:imeOptions="actionDone"/>
-	            
-	            <Button
-	                android:id="@+id/button_editHabitData"
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:text="@string/button_editHabitData_label"
-	                android:paddingLeft="20dp"
-	                android:paddingRight="20dp"
-	                android:layout_margin="10dp"
-	                android:background="#AAAAAA" />
-	        
-	    </LinearLayout>
-	    
-	    <View
-	        android:layout_width="match_parent"
-	        android:layout_height="2dp"
-	        android:background="#000000"
-	        android:layout_marginLeft="20dp"
-	        android:layout_marginRight="20dp"
-	        android:layout_marginTop="10dp"
-	        android:layout_marginBottom="10dp" />
-	    
-	    <LinearLayout 
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal"
-	        android:gravity="center">
-	        
-	        <TextView 
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:text="@string/text_goalLabel"
-	            android:textSize="30sp"
-	            android:textStyle="bold"
-	            android:layout_margin="10dp" />
-	        
-	        <TextView 
-	            android:id="@+id/textView_goalValue"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:textSize="30sp"
-	            android:textStyle="bold"/>
-	        
-	    </LinearLayout>
-	    
-	    <LinearLayout
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal"
-	        android:gravity="center"
-	        android:layout_marginBottom="100dp">
-	            
-	            <EditText 
-			        android:id="@+id/editText_editGoal"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:hint="@string/editText_editGoal_hint"
-			        android:singleLine="true"
-			        android:inputType="number"
-			        android:imeOptions="actionDone"/>
-	            
-	            <Button
-	                android:id="@+id/button_editGoal"
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:text="@string/button_editGoal_label"
-	                android:paddingLeft="20dp"
-	                android:paddingRight="20dp"
-	                android:layout_margin="10dp"
-	                android:background="#AAAAAA" />
-	        
-	    </LinearLayout>
 	
 	</LinearLayout>
 </ScrollView>

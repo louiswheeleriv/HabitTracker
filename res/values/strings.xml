@@ -24,14 +24,21 @@
     <string name="text_habitData_dateValueLabel">Value:</string>
     <string name="text_graphHeader">Progress</string>
     <string name="text_noProgressData">No recorded data</string>
+    <string name="text_habitData">Data by Date</string>
     <string name="editText_editHabitData_hint">Value for date...</string>
-    <string name="button_editHabitData_label">Save</string>
+    <string name="button_editHabitData_edit">Set Value</string>
+    <string name="button_editHabitData_cancel">Cancel</string>
+    <string name="button_editHabitData_save">Save</string>
+    <string name="button_editHabitData_erase">Erase</string>
     <string name="button_deleteHabitType">Delete</string>
     <string name="button_generateData">Generate Data</string>
     
     <string name="text_goalLabel">Goal:</string>
     <string name="editText_editGoal_hint">New goal...</string>
-    <string name="button_editGoal_label">Save</string>
+    <string name="button_editGoal_label_edit">Set Value</string>
+    <string name="button_editGoal_label_cancel">Cancel</string>
+    <string name="button_editGoal_label_save">Save</string>
+    <string name="button_editGoal_label_erase">Erase</string>
     
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
