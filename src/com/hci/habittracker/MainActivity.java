@@ -88,20 +88,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
         	Log.d("HabitType", log);
         }
     }
-    
-    /*
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
-            Log.e("On Config Change","LANDSCAPE");
-        }else{
-            Log.e("On Config Change","PORTRAIT");
-        }
-
-    }
-    */
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
@@ -115,13 +101,10 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_section_home);
-                break;
-            case 2:
                 mTitle = getString(R.string.title_section_habits);
                 break;
-            case 3:
-            	mTitle = getString(R.string.title_section_progress);
+            case 2:
+            	mTitle = getString(R.string.title_section_help);
             	break;
         }
     }

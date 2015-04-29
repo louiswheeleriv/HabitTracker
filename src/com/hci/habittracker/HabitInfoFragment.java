@@ -43,7 +43,9 @@ public class HabitInfoFragment extends Fragment{
 	
 	DatabaseHandler db;
 	String selectedHabitTypeName = "";
-	Date dateSelected = new Date();
+	Date selectedDate = new Date();
+	
+	HabitType selectedHabitType;
 	
 	@Override
 	public void onCreate(Bundle save){
@@ -63,6 +65,8 @@ public class HabitInfoFragment extends Fragment{
 		Bundle args = getArguments();
 		if (args != null && args.containsKey("HabitType")){
 			selectedHabitTypeName = args.getString("HabitType");
+			selectedHabitType = db.getHabitType(selectedHabitTypeName);
+			
 			if(args.containsKey("Selected Date")){
 				int[] dateArray = args.getIntArray("Selected Date");
 				int year = dateArray[0];
@@ -74,13 +78,18 @@ public class HabitInfoFragment extends Fragment{
 				chosenDate.setMonth(month);
 				chosenDate.setYear(year-1900);
 				
-				dateSelected = chosenDate;
+				selectedDate = chosenDate;
 			}
 		}
 		
 		// Habit name at top
 		TextView textView_habitName = (TextView) rootview.findViewById(R.id.textView_habitName);
 		textView_habitName.setText(selectedHabitTypeName);
+		if(selectedHabitType.isGoodHabit()){
+			textView_habitName.setTextColor(Color.parseColor("#00CC00"));
+		}else{
+			textView_habitName.setTextColor(Color.parseColor("#CC0000"));
+		}
 		
 		// Control for delete button
 		Button button_deleteHabitType = (Button) rootview.findViewById(R.id.button_deleteHabitType);
@@ -101,7 +110,7 @@ public class HabitInfoFragment extends Fragment{
 				chosenDate.setMonth(monthOfYear);
 				chosenDate.setYear(year-1900);
 				
-				dateSelected = chosenDate;
+				selectedDate = chosenDate;
 				
 				showSelectedDateData();
 				
@@ -131,6 +140,7 @@ public class HabitInfoFragment extends Fragment{
 		});
 		
 		// Control for data editing
+		final EditText editText_editHabitData = (EditText) rootview.findViewById(R.id.editText_editHabitData);
 		final Button button_editHabitData_edit = (Button) rootview.findViewById(R.id.button_editHabitData_edit);
 		button_editHabitData_edit.setOnClickListener(new OnClickListener() {
 			public void onClick(View v){
@@ -141,14 +151,15 @@ public class HabitInfoFragment extends Fragment{
 					button_editHabitData_edit.setText(R.string.button_editHabitData_cancel);
 				}else if(label.equals("Cancel")){
 					LinearLayout linearLayout_habitData_edit = (LinearLayout) getActivity().findViewById(R.id.linearLayout_habitData_edit);
+					editText_editHabitData.setText("");
 					linearLayout_habitData_edit.setVisibility(View.GONE);
 					button_editHabitData_edit.setText(R.string.button_editHabitData_edit);
+					hideKeyboard();
 				}
 			}
 		});
 		
 		// Edit value for date
-		final EditText editText_editHabitData = (EditText) rootview.findViewById(R.id.editText_editHabitData);
 		Button button_editHabitData_save = (Button) rootview.findViewById(R.id.button_editHabitData_save);
 		button_editHabitData_save.setOnClickListener(new OnClickListener() {
 			public void onClick(View v){
@@ -176,6 +187,7 @@ public class HabitInfoFragment extends Fragment{
 		});
 		
 		// Control for goal editing
+		final EditText editText_editGoal = (EditText) rootview.findViewById(R.id.editText_editGoal);
 		final Button button_editGoal_edit = (Button) rootview.findViewById(R.id.button_editGoal_edit);
 		button_editGoal_edit.setOnClickListener(new OnClickListener() {
 			public void onClick(View v){
@@ -186,14 +198,15 @@ public class HabitInfoFragment extends Fragment{
 					button_editGoal_edit.setText(R.string.button_editGoal_label_cancel);
 				}else if(label.equals("Cancel")){
 					LinearLayout linearLayout_goal_edit = (LinearLayout) getActivity().findViewById(R.id.linearLayout_goal_edit);
+					editText_editGoal.setText("");
 					linearLayout_goal_edit.setVisibility(View.GONE);
 					button_editGoal_edit.setText(R.string.button_editGoal_label_edit);
+					hideKeyboard();
 				}
 			}
 		});
 		
 		// Edit goal
-		final EditText editText_editGoal = (EditText) rootview.findViewById(R.id.editText_editGoal);
 		Button button_editGoal_save = (Button) rootview.findViewById(R.id.button_editGoal_save);
 		button_editGoal_save.setOnClickListener(new OnClickListener() {
 			public void onClick(View v){
@@ -206,6 +219,7 @@ public class HabitInfoFragment extends Fragment{
 			}
 		});
 		
+		// Erase goal data
 		Button button_editGoal_erase = (Button) rootview.findViewById(R.id.button_editGoal_erase);
 		button_editGoal_erase.setOnClickListener(new OnClickListener() {
 			public void onClick(View v){
@@ -233,13 +247,13 @@ public class HabitInfoFragment extends Fragment{
 	
 	public void determineDate(){
 		DatePicker datePicker_habitData = (DatePicker) getActivity().findViewById(R.id.datePicker_habitData);
-		datePicker_habitData.updateDate(dateSelected.getYear() + 1900, dateSelected.getMonth(), dateSelected.getDate());
+		datePicker_habitData.updateDate(selectedDate.getYear() + 1900, selectedDate.getMonth(), selectedDate.getDate());
 	}
 	
 	public void showSelectedDateData(){
 		TextView textView_habitData_dateValue = (TextView) getActivity().findViewById(R.id.textView_habitData_dateValue);
 		
-		int valueToSet = getHabitDataForDate(dateSelected);
+		int valueToSet = getHabitDataForDate(selectedDate);
 		if(valueToSet >= 0){
 			textView_habitData_dateValue.setText(String.valueOf(valueToSet));
 		}else{
@@ -258,11 +272,11 @@ public class HabitInfoFragment extends Fragment{
 	}
 	
 	public void setHabitDataForDate(int value){
-		db.addHabitDataForDate(selectedHabitTypeName, dateSelected, value);
+		db.addHabitDataForDate(selectedHabitTypeName, selectedDate, value);
 	}
 	
 	public void removeHabitDataForDate(){
-		db.removeHabitDataForDate(dateSelected);
+		db.removeHabitDataForDate(selectedDate);
 	}
 	
 	public int getHabitDataForDate(Date date){
@@ -305,7 +319,13 @@ public class HabitInfoFragment extends Fragment{
 			progress.remove(dt);
 		}
 		
-		if(progress.size() > 1){
+		if(progress.size() == 0){
+			TextView textView_noProgressData = (TextView) rootview.findViewById(R.id.textView_noProgressData);
+			textView_noProgressData.setText(R.string.text_noProgressData);
+		} else if(progress.size() == 1){
+			TextView textView_noProgressData = (TextView) rootview.findViewById(R.id.textView_noProgressData);
+			textView_noProgressData.setText(R.string.text_insufficientProgressData);
+		} else if(progress.size() > 1){
 			
 			DataPoint[] dataPoints = new DataPoint[progress.size()];
 			List<Date> dates = new ArrayList<Date>();
@@ -391,7 +411,7 @@ public class HabitInfoFragment extends Fragment{
 			Log.d("ALERT", "Setting graph min date to " + minDate.toString());
 			Log.d("ALERT", "Setting graph max date to " + maxDate.toString());
 			
-			graph.getViewport().setMinY(lowestValue);
+			//graph.getViewport().setMinY(lowestValue);
 			graph.getViewport().setMaxY(highestValue);
 			graph.getViewport().setYAxisBoundsManual(true);
 			

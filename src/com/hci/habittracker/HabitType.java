@@ -4,18 +4,21 @@ public class HabitType {
 
 	private int id;
 	private String name;
+	private boolean goodHabit = true;
 	
 	public HabitType(){
 		
 	}
 	
-	public HabitType(int id, String name){
+	public HabitType(int id, String name, boolean goodHabit){
 		this.id = id;
 		this.name = name;
+		this.goodHabit = goodHabit;
 	}
 	
-	public HabitType(String name){
+	public HabitType(String name, boolean goodHabit){
 		this.name = name;
+		this.goodHabit = goodHabit;
 	}
 	
 	public int getId(){
@@ -32,6 +35,14 @@ public class HabitType {
 	
 	public void setName(String name){
 		this.name = name;
+	}
+	
+	public boolean isGoodHabit(){
+		return goodHabit;
+	}
+	
+	public void setGoodHabit(boolean goodHabit){
+		this.goodHabit = goodHabit;
 	}
 	
 }

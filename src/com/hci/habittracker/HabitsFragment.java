@@ -2,7 +2,9 @@ package com.hci.habittracker;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
@@ -17,6 +19,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -32,9 +35,11 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class HabitsFragment extends ListFragment {
@@ -61,15 +66,18 @@ public class HabitsFragment extends ListFragment {
 		
 		final Button button_addHabitType_start = (Button) rootview.findViewById(R.id.button_addHabitType_start);
 		final EditText editText_addHabitType = (EditText) rootview.findViewById(R.id.editText_addHabitType_name);
+		final CheckBox checkbox_goodHabit = (CheckBox) rootview.findViewById(R.id.checkbox_goodHabit);
 		final Button button_addHabitType_submit = (Button) rootview.findViewById(R.id.button_addHabitType_submit);
 		final Button button_addHabitType_cancel = (Button) rootview.findViewById(R.id.button_addHabitType_cancel);
 		final LinearLayout addHabitTypeSection = (LinearLayout) rootview.findViewById(R.id.linearLayout_addHabitType_inner);
+		final LinearLayout linearLayout_habitTypes = (LinearLayout) rootview.findViewById(R.id.linearLayout_habitTypes);
 		
 		// Initial create habit type button clicked
 		button_addHabitType_start.setOnClickListener(new OnClickListener() {
 			public void onClick(View v){	
 				button_addHabitType_start.setVisibility(View.GONE);
 				addHabitTypeSection.setVisibility(View.VISIBLE);
+				linearLayout_habitTypes.setVisibility(View.GONE);
 			}
 		});
 		
@@ -77,10 +85,12 @@ public class HabitsFragment extends ListFragment {
 		button_addHabitType_submit.setOnClickListener(new OnClickListener() {
 			public void onClick(View v){
 				String habitTypeName = editText_addHabitType.getText().toString();
-				db.addHabitType(new HabitType(habitTypeName));
+				boolean goodHabit = checkbox_goodHabit.isChecked();
+				db.addHabitType(new HabitType(habitTypeName, goodHabit));
 
 				button_addHabitType_start.setVisibility(View.VISIBLE);
 				addHabitTypeSection.setVisibility(View.GONE);
+				linearLayout_habitTypes.setVisibility(View.VISIBLE);
 				
 				hideKeyboard();
 				
@@ -92,9 +102,13 @@ public class HabitsFragment extends ListFragment {
 		button_addHabitType_cancel.setOnClickListener(new OnClickListener() {
 			public void onClick(View v){
 				editText_addHabitType.setText("");
+				checkbox_goodHabit.setChecked(false);
 
 				button_addHabitType_start.setVisibility(View.VISIBLE);
 				addHabitTypeSection.setVisibility(View.GONE);
+				linearLayout_habitTypes.setVisibility(View.VISIBLE);
+				
+				hideKeyboard();
 			}
 		});
 		

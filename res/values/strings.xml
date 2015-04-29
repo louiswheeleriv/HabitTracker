@@ -6,9 +6,9 @@
     <string name="habitsFragmentName">HabitsFragment</string>
     <string name="habitsInfoFragmentName">HabitInfoFragment</string>
     
-    <string name="title_section_home">Home</string>
+    <!--<string name="title_section_home">Home</string>-->
     <string name="title_section_habits">Habits</string>
-    <string name="title_section_progress">Progress</string>
+    <string name="title_section_help">Help</string>
     
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -18,20 +18,21 @@
     <string name="button_addHabitType_start">Add Habit Type</string>
     <string name="text_addHabitType_header">New Habit Type</string>
     <string name="editText_addHabitType_hint">Name of new habit...</string>
+    <string name="checkbox_goodHabit">Good habit</string>
     <string name="button_addHabitType_submit">Create Habit Type</string>
     <string name="button_addHabitType_cancel">Cancel</string>
     
     <string name="text_habitData_dateValueLabel">Value:</string>
     <string name="text_graphHeader">Progress</string>
     <string name="text_noProgressData">No recorded data</string>
+    <string name="text_insufficientProgressData">Only one data point recorded, record more to produce a graph.</string>
     <string name="text_habitData">Data by Date</string>
     <string name="editText_editHabitData_hint">Value for date...</string>
     <string name="button_editHabitData_edit">Set Value</string>
     <string name="button_editHabitData_cancel">Cancel</string>
     <string name="button_editHabitData_save">Save</string>
     <string name="button_editHabitData_erase">Erase</string>
-    <string name="button_deleteHabitType">Delete</string>
-    <string name="button_generateData">Generate Data</string>
+    <string name="button_deleteHabitType">Delete Habit</string>
     
     <string name="text_goalLabel">Goal:</string>
     <string name="editText_editGoal_hint">New goal...</string>

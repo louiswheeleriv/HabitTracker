@@ -29,6 +29,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	
 	private static final String KEY_ID = "id";
 	private static final String KEY_NAME = "name";
+	private static final String KEY_GOODHABIT = "goodHabit";
 	
 	private static final String KEY_HABITTYPE_ID = "habitType_id";
 	private static final String KEY_DATE = "date";
@@ -44,7 +45,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		String CREATE_HABITTYPES_TABLE = "CREATE TABLE " + TABLE_HABITTYPES + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT, " + KEY_GOAL + " INTEGER" + ")";
+				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT, " + KEY_GOODHABIT + " INTEGER, " + KEY_GOAL + "INTEGER" + ")";
 		
 		String CREATE_HABITS_TABLE = "CREATE TABLE " + TABLE_HABITS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_HABITTYPE_ID + " INTEGER NOT NULL,"
@@ -79,6 +80,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		
 		ContentValues values = new ContentValues();
 		values.put(KEY_NAME, habitType.getName());
+		values.put(KEY_GOODHABIT, habitType.isGoodHabit());
 		
 		db.insert(TABLE_HABITTYPES, null, values);
 		db.close();		
@@ -87,15 +89,20 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 	public HabitType getHabitType(int id){
 		SQLiteDatabase db = this.getReadableDatabase();
 		
-		Cursor cursor = db.query(TABLE_HABITTYPES, new String[] {KEY_ID, KEY_NAME}, KEY_ID + "=?",
+		Cursor cursor = db.query(TABLE_HABITTYPES, new String[] {KEY_ID, KEY_NAME, KEY_GOODHABIT}, KEY_ID + "=?",
 				new String[] {String.valueOf(id)}, null, null, null, null);
 		
 		if(cursor != null)
 			cursor.moveToFirst();
 		
+		int habitTypeId = cursor.getInt(0);
 		String name = cursor.getString(1);
+		boolean goodHabit = true;
+		if(cursor.getInt(2) == 0){
+			goodHabit = false;
+		}
 		
-		HabitType habitType = new HabitType(Integer.parseInt(cursor.getString(0)), name);
+		HabitType habitType = new HabitType(habitTypeId, name, goodHabit);
 		db.close();
 		return habitType;
 	}
@@ -213,6 +220,26 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 		String dateString = year + "-" + month + "-" + day;
 		
 		db.delete(TABLE_HABITS, KEY_DATE + " = ?", new String[] {dateString});
+	}
+	
+	public HabitType getHabitType(String habitTypeName){
+		SQLiteDatabase db = this.getReadableDatabase();
+		
+		Cursor cursor = db.query(TABLE_HABITTYPES, new String[] {KEY_ID, KEY_NAME, KEY_GOODHABIT}, KEY_NAME + " = ?",
+				new String[] {habitTypeName}, null, null, null, null);
+		
+		cursor.moveToFirst();
+		
+		int habitTypeId = cursor.getInt(0);
+		String name = cursor.getString(1);
+		boolean goodHabit = true;
+		if(cursor.getInt(2) == 0){
+			goodHabit = false;
+		}
+		
+		HabitType habitType = new HabitType(habitTypeId, name, goodHabit);
+		db.close();
+		return habitType;
 	}
 	
 	public Habit getHabit(String habitTypeName){
@@ -376,6 +403,17 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 				+ KEY_HABITTYPE_ID + " INTEGER PRIMARY KEY," + KEY_GOAL + " INTEGER" + ")";
 		
 		db.execSQL(CREATE_GOALS_TABLE);
+	}
+	
+	public void updateHabitTypesTable(){
+		SQLiteDatabase db = this.getWritableDatabase();
+		String DROP_HABITTYPES_TABLE = "DROP TABLE " + TABLE_HABITTYPES;
+		
+		String CREATE_HABITTYPES_TABLE = "CREATE TABLE " + TABLE_HABITTYPES + "("
+				+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT, " + KEY_GOODHABIT + " INTEGER, " + KEY_GOAL + "INTEGER" + ")";
+		
+		db.execSQL(DROP_HABITTYPES_TABLE);
+		db.execSQL(CREATE_HABITTYPES_TABLE);
 	}
 	
 }

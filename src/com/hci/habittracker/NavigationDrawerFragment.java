@@ -107,9 +107,8 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.layout.simple_list_item_1,
                 android.R.id.text1,
                 new String[]{
-                        getString(R.string.title_section_home),
                         getString(R.string.title_section_habits),
-                        getString(R.string.title_section_progress)
+                        getString(R.string.title_section_help)
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
@@ -210,14 +209,11 @@ public class NavigationDrawerFragment extends Fragment {
         switch(position) {
             default:
             case 0:
-                fragment = new HomeFragment();
-                break;
-            case 1:
                 fragment = new HabitsFragment();
                 break;
-            case 2:
-            	fragment = new ProgressFragment();
-            	break;
+            case 1:
+                fragment = new HelpFragment();
+                break;
         }
         fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
         
@@ -269,10 +265,12 @@ public class NavigationDrawerFragment extends Fragment {
             return true;
         }
 
+        /*
         if (item.getItemId() == R.id.action_example) {
             Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT).show();
             return true;
         }
+        */
 
         return super.onOptionsItemSelected(item);
     }
