@@ -1,15 +1,11 @@
 package com.hci.habittracker;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -20,19 +16,15 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -92,10 +84,29 @@ public class HabitInfoFragment extends Fragment{
 		}
 		
 		// Control for delete button
-		Button button_deleteHabitType = (Button) rootview.findViewById(R.id.button_deleteHabitType);
+		final Button button_deleteHabitType = (Button) rootview.findViewById(R.id.button_deleteHabitType);
+		final LinearLayout linearLayout_delete = (LinearLayout) rootview.findViewById(R.id.linearLayout_delete);
+		final Button button_deleteYes = (Button) rootview.findViewById(R.id.button_deleteYes);
+		final Button button_deleteNo = (Button) rootview.findViewById(R.id.button_deleteNo);
+		
 		button_deleteHabitType.setOnClickListener(new OnClickListener() {
 			public void onClick(View v){
+				//deleteThisHabitType();
+				button_deleteHabitType.setVisibility(View.GONE);
+				linearLayout_delete.setVisibility(View.VISIBLE);
+			}
+		});
+		
+		button_deleteYes.setOnClickListener(new OnClickListener() {
+			public void onClick(View v){
 				deleteThisHabitType();
+			}
+		});
+		
+		button_deleteNo.setOnClickListener(new OnClickListener() {
+			public void onClick(View v){
+				linearLayout_delete.setVisibility(View.GONE);
+				button_deleteHabitType.setVisibility(View.VISIBLE);
 			}
 		});
 		
@@ -319,6 +330,11 @@ public class HabitInfoFragment extends Fragment{
 			progress.remove(dt);
 		}
 		
+		if(isGoalMet()){
+			TextView textView_goalMet = (TextView) rootview.findViewById(R.id.textView_goalMet);
+			textView_goalMet.setVisibility(View.VISIBLE);
+		}
+		
 		if(progress.size() == 0){
 			TextView textView_noProgressData = (TextView) rootview.findViewById(R.id.textView_noProgressData);
 			textView_noProgressData.setText(R.string.text_noProgressData);
@@ -339,9 +355,7 @@ public class HabitInfoFragment extends Fragment{
 			
 			for(Date dt : dates){
 				int value = progress.get(dt);
-				if(value >= 0){
-					Log.d("ALERT", "Creating datapoint with date " + dt.toString());
-					
+				if(value >= 0){				
 					dataPoints[count] = new DataPoint(dt, value);
 					count++;
 						
@@ -385,7 +399,13 @@ public class HabitInfoFragment extends Fragment{
 			if(goal >= 0){
 				DataPoint[] goalDataPoints = new DataPoint[2];
 				goalDataPoints[0] = new DataPoint(minDate, goal);
-				goalDataPoints[1] = new DataPoint(new Date(), goal);
+				goalDataPoints[1] = new DataPoint(maxDate, goal);
+				
+				if(goal < lowestValue){
+					lowestValue = goal;
+				}else if(goal > highestValue){
+					highestValue = goal;
+				}
 				
 				LineGraphSeries<DataPoint> goalSeries = new LineGraphSeries<DataPoint>(goalDataPoints);
 				goalSeries.setColor(Color.RED);
@@ -407,15 +427,43 @@ public class HabitInfoFragment extends Fragment{
 			graph.getViewport().setMinX(minDate.getTime());
 			graph.getViewport().setMaxX(maxDate.getTime());
 			graph.getViewport().setXAxisBoundsManual(true);
-
-			Log.d("ALERT", "Setting graph min date to " + minDate.toString());
-			Log.d("ALERT", "Setting graph max date to " + maxDate.toString());
 			
-			//graph.getViewport().setMinY(lowestValue);
+			graph.getViewport().setMinY(lowestValue);
 			graph.getViewport().setMaxY(highestValue);
 			graph.getViewport().setYAxisBoundsManual(true);
 			
 		}
+	}
+	
+	public boolean isGoalMet(){
+		int goal = getGoalForHabit();
+		Habit selectedHabit = db.getHabit(selectedHabitTypeName);
+		List<Date> datesTracked = new ArrayList<Date>();
+		Map<Date, Integer> progress = selectedHabit.getProgress();
+		datesTracked.addAll(progress.keySet());
+		Collections.sort(datesTracked);
+		boolean isGoodHabit = selectedHabitType.isGoodHabit();
+		
+		if(isGoodHabit){
+			if(progress.size() > 0){
+				if(progress.get(datesTracked.get(datesTracked.size() - 1)) >= goal && goal != -1){
+					return true;
+				}else{
+					return false;
+				}
+			}
+		}else{
+			if(progress.size() > 0){
+				if(progress.get(datesTracked.get(datesTracked.size() - 1)) <= goal && goal != -1){
+					return true;
+				}else{
+					return false;
+				}
+			}
+		}
+		
+		return false;
+		
 	}
 	
 	public void hideKeyboard() {

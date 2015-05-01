@@ -26,6 +26,7 @@
     <string name="text_graphHeader">Progress</string>
     <string name="text_noProgressData">No recorded data</string>
     <string name="text_insufficientProgressData">Only one data point recorded, record more to produce a graph.</string>
+    <string name="text_goalMet">Congratulations, you have met your goal for this habit!  Try setting a new goal or tracking a new habit.</string>
     <string name="text_habitData">Data by Date</string>
     <string name="editText_editHabitData_hint">Value for date...</string>
     <string name="button_editHabitData_edit">Set Value</string>
@@ -34,12 +35,25 @@
     <string name="button_editHabitData_erase">Erase</string>
     <string name="button_deleteHabitType">Delete Habit</string>
     
+    <string name="text_deleteAreYouSure">Are you sure?</string>
+    <string name="button_deleteYes">Yes, delete it</string>
+    <string name="button_deleteNo">No, don\'t delete</string>
+    
     <string name="text_goalLabel">Goal:</string>
     <string name="editText_editGoal_hint">New goal...</string>
     <string name="button_editGoal_label_edit">Set Value</string>
     <string name="button_editGoal_label_cancel">Cancel</string>
     <string name="button_editGoal_label_save">Save</string>
     <string name="button_editGoal_label_erase">Erase</string>
+    
+    <string name="text_help">Help Topics</string>
+    <string name="button_helpBack">Back</string>
+    <string name="help_1_q">How do I track a habit?</string>
+    <string name="help_1_a">   On the habits page, tap the "Add Habit Type" button, fill out the relevant information, then click "Create Habit Type."</string>
+    <string name="help_2_q">How do I record habit data?</string>
+    <string name="help_2_a">   Choose a habit from the list on the habits page, then scroll down to the "Data by Date" section.  Choose the date you want to enter data for, and tap the "Set Value" button.  Enter the data and click "Save."</string>
+    <string name="help_3_q">How do I stop tracking a habit?</string>
+    <string name="help_3_a">   Choose the habit from the list on the habits page, then scroll to the bottom and click "Delete."</string>
     
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
